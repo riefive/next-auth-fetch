@@ -8,7 +8,7 @@ const AccessButton = () => {
 
   if (session && session.user) {
     return (
-      <div className="flex gap-4 ml-auto">
+      <div className="flex justify-end gap-4 ml-auto p-2">
         <p className="text-sky-600">{session.user.name}</p>
         <button onClick={() => signOut()} className="text-red-600">
           Sign Out
@@ -17,9 +17,11 @@ const AccessButton = () => {
     );
   }
   return (
-    <Link href={"/signin"} className="flex gap-4 ml-auto text-green-600">
-      Sign In
-    </Link>
+    <div className="flex gap-4 ml-auto p-2">
+      <Link href={"/signin"} className="flex gap-4 ml-auto text-green-600">
+        Sign In
+      </Link>
+    </div>
   );
 };
 

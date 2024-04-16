@@ -2,12 +2,10 @@ import NextAuth from 'next-auth/next';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { AuthOptions } from 'next-auth';
 
-const apiUrl = process.env.FAKE_API_REST ?? 'http://localhost:3000'
-
 export const authOptions: AuthOptions = {
     providers: [
         CredentialsProvider({
-            name: 'Credentials',
+            name: 'auth',
             credentials: {
                 email: {
                     label: 'Email',
@@ -20,11 +18,11 @@ export const authOptions: AuthOptions = {
                 },
             },
             authorize: async (credentials) => {
+                const apiUrl = process.env.FAKE_API_REST || 'http://localhost:3000'
+
                 if (!credentials) {
                     return null;
                 }
-
-                console.log(apiUrl)
 
                 const { email, password } = credentials;
 
@@ -39,9 +37,11 @@ export const authOptions: AuthOptions = {
                     }),
                 });
 
-                const token = await res.json();
+                const tokenRaw = await res.json();
 
-                if (!token) return null
+                if (!tokenRaw) return null
+
+                const token = tokenRaw?.access_token
 
                 const resProfile = await fetch(`${apiUrl}/v1/auth/profile`, {
                     method: 'GET',
@@ -53,12 +53,50 @@ export const authOptions: AuthOptions = {
                 const user = await resProfile.json();
 
                 if (!user) return null;
-                return user;
+
+                return {
+                    id: user?.id,
+                    email: user?.email,
+                    name: user?.name,
+                    role: user?.role,
+                    avatar: user?.avatar
+                };
             }
         })
     ],
     pages: {
         signIn: '/signin',
+    },
+    session: {
+        strategy: 'jwt'
+    },
+    secret: process.env.AUTH_SECRET,
+    callbacks: {
+        session: ({ session, token }) => {
+            if(session.user){
+                return {
+                    ...session,
+                    user: {
+                        ...session.user,
+                        id: token.id,
+                        role: token.role
+                    },
+                };
+            }
+            return session
+            
+        },
+        jwt: ({ token, user }) => {
+            if (user) {
+                const u = user as unknown as any;
+                return {
+                    ...token,
+                    id: u.id,
+                    role: u.role
+                };
+            }
+            return token;
+        },
     },
 };
 

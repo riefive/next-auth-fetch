@@ -18,12 +18,19 @@ const Login = (props: Props) => {
 
     const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        console.log(emailVal.current)
+
         const res = await signIn('credentials', {
-          email: emailVal.current,
-          password: passwordVal.current,
-          redirect: false,
+            email: emailVal.current,
+            password: passwordVal.current,
+            redirect: false,
+            // redirect: true,
+            // callbackUrl: '/',
         });
+
+        if (!res) {
+            console.log(res)
+            return null
+        }
     
         if (!res?.error) {
           router.push(props.callbackUrl ?? 'http://localhost:3000');
