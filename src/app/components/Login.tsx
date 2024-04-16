@@ -32,9 +32,7 @@ const Login = (props: Props) => {
             return null
         }
     
-        if (!res?.error) {
-          router.push(props.callbackUrl ?? 'http://localhost:3000');
-        }
+        router.push(props.callbackUrl ?? 'http://localhost:3000');
     };
 
     return (
