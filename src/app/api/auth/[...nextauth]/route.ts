@@ -40,6 +40,15 @@ export const authOptions: AuthOptions = {
                 const tokenRaw = await res.json();
 
                 if (!tokenRaw) return null
+                console.log(tokenRaw)
+                console.log(tokenRaw?.message === 'Unauthorized')
+                console.log(Number(tokenRaw?.statusCode || 0) === 401)
+                if (tokenRaw?.message === 'Unauthorized' || Number(tokenRaw?.statusCode || 0) === 401) {
+                    return {
+                        error: tokenRaw?.message || 'Authentication Failed',
+                        ok: false
+                    } as any
+                }
 
                 const token = tokenRaw?.access_token
 

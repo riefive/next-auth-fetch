@@ -8,12 +8,12 @@ import { signIn } from 'next-auth/react';
 type Props = {
     className?: string;
     callbackUrl?: string;
-    error?: string;
 };
 
 const Login = (props: Props) => {
     const router = useRouter();
     const emailVal = useRef('');
+    const errorVal = useRef('');
     const passwordVal = useRef('');
 
     const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -27,19 +27,21 @@ const Login = (props: Props) => {
             // callbackUrl: '/',
         });
 
-        if (!res) {
-            console.log(res)
+        if (!res) return null
+        console.log(res)
+        if (res?.error) {
+            errorVal.current = res?.error || ''
             return null
         }
-    
-        router.push(props.callbackUrl ?? 'http://localhost:3000');
+
+        router.push(props.callbackUrl ?? "http://localhost:3000");
     };
 
     return (
         <div className={props.className}>
-            {!!props.error && (
+            {!!errorVal.current && (
                 <p className="bg-red-100 text-red-600 text-center p-2">
-                    Authentication Failed
+                    { errorVal.current || 'Authentication Failed' }
                 </p>
             )}
             <form onSubmit={onSubmit} className="p-2 flex flex-col gap-3">
