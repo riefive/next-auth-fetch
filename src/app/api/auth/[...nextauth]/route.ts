@@ -40,14 +40,8 @@ export const authOptions: AuthOptions = {
                 const tokenRaw = await res.json();
 
                 if (!tokenRaw) return null
-                console.log(tokenRaw)
-                console.log(tokenRaw?.message === 'Unauthorized')
-                console.log(Number(tokenRaw?.statusCode || 0) === 401)
                 if (tokenRaw?.message === 'Unauthorized' || Number(tokenRaw?.statusCode || 0) === 401) {
-                    return {
-                        error: tokenRaw?.message || 'Authentication Failed',
-                        ok: false
-                    } as any
+                    throw new Error(JSON.stringify({ response: tokenRaw, status: false }));
                 }
 
                 const token = tokenRaw?.access_token
@@ -68,7 +62,9 @@ export const authOptions: AuthOptions = {
                     email: user?.email,
                     name: user?.name,
                     role: user?.role,
-                    avatar: user?.avatar
+                    avatar: user?.avatar,
+                    token: token,
+                    refresh: tokenRaw?.refresh_token
                 };
             }
         })
@@ -82,13 +78,16 @@ export const authOptions: AuthOptions = {
     secret: process.env.AUTH_SECRET,
     callbacks: {
         session: ({ session, token }) => {
-            if(session.user){
+            if (session.user){
                 return {
                     ...session,
                     user: {
                         ...session.user,
                         id: token.id,
-                        role: token.role
+                        role: token.role,
+                        avatar: token.avatar,
+                        token: token.token,
+                        refresh: token.refresh
                     },
                 };
             }
@@ -101,7 +100,10 @@ export const authOptions: AuthOptions = {
                 return {
                     ...token,
                     id: u.id,
-                    role: u.role
+                    role: u.role,
+                    avatar: u.avatar,
+                    token: u.token,
+                    refresh: u.refresh
                 };
             }
             return token;
