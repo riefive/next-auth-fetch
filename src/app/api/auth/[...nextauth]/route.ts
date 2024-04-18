@@ -63,8 +63,8 @@ export const authOptions: AuthOptions = {
                     name: user?.name,
                     role: user?.role,
                     avatar: user?.avatar,
-                    token: token,
-                    refresh: tokenRaw?.refresh_token
+                    access_token: token,
+                    refresh_token: tokenRaw?.refresh_token
                 };
             }
         })
@@ -75,10 +75,13 @@ export const authOptions: AuthOptions = {
     session: {
         strategy: 'jwt'
     },
-    secret: process.env.AUTH_SECRET,
+    secret: process.env.NEXTAUTH_SECRET,
     callbacks: {
-        session: ({ session, token }) => {
-            if (session.user){
+        session: ({ session, trigger, newSession, token }) => {
+            if (trigger === 'update' && newSession?.name) {
+                console.log(newSession)
+            }
+            if (session.user) {
                 return {
                     ...session,
                     user: {
@@ -86,15 +89,15 @@ export const authOptions: AuthOptions = {
                         id: token.id,
                         role: token.role,
                         avatar: token.avatar,
-                        token: token.token,
+                        access: token.access,
                         refresh: token.refresh
                     },
                 };
             }
             return session
-            
         },
-        jwt: ({ token, user }) => {
+        jwt: ({ user, token }) => {
+            /*
             if (user) {
                 const u = user as unknown as any;
                 return {
@@ -102,15 +105,23 @@ export const authOptions: AuthOptions = {
                     id: u.id,
                     role: u.role,
                     avatar: u.avatar,
-                    token: u.token,
-                    refresh: u.refresh
+                    token: u.access_token,
+                    refresh: u.access_token
                 };
+            }
+            */
+            if (user) {
+                const u = user as unknown as any;
+                token.role = u.role,
+                token.avatar = u.avatar,
+                token.access = u.access_token;
+                token.refresh = u.refresh_token;
             }
             return token;
         },
     },
 };
 
-const handler = NextAuth(authOptions);
+export const handler = NextAuth(authOptions);
 
 export { handler as GET, handler as POST };

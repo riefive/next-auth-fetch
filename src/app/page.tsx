@@ -1,6 +1,7 @@
 'use client';
 
-import { useSession } from 'next-auth/react'
+import { useSession } from 'next-auth/react';
+import AccessButton from './components/AccessButton';
 
 export default function Home() {
   const { data: session, status } = useSession()
@@ -9,8 +10,11 @@ export default function Home() {
   console.log(status)
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-       <p>Hi, You Are Entering Next Auth Sample.</p>
-    </main>
+    <div>
+      <AccessButton />
+      <main className="flex min-h-screen flex-col items-center justify-between p-24">
+        <p>Hi, You Are Entering Next Auth Sample.</p>
+      </main>
+    </div>
   );
 }
