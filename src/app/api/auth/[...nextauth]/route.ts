@@ -97,19 +97,6 @@ export const authOptions: AuthOptions = {
             return session
         },
         jwt: ({ user, token }) => {
-            /*
-            if (user) {
-                const u = user as unknown as any;
-                return {
-                    ...token,
-                    id: u.id,
-                    role: u.role,
-                    avatar: u.avatar,
-                    token: u.access_token,
-                    refresh: u.access_token
-                };
-            }
-            */
             if (user) {
                 const u = user as unknown as any;
                 token.role = u.role,
