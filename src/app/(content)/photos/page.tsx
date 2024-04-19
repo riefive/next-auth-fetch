@@ -16,7 +16,7 @@ const Item = styled(Paper)(({ theme }) => ({
 }));
 
 export default function PhotosPage() {
-    const photos = Array.from({ length: 6 }, (_, i) => i + 1);
+    const photos = Array.from({ length: 9 }, (_, i) => i + 1);
 
     return (
         <Box sx={{ flexGrow: 1, padding: 2 }}>
